@@ -71,4 +71,23 @@ const getAllUsers = async (req, res, next) => {
     next(error)
   }
 }
-module.exports = { createUser, getUserById, getAllUsers, updateUserById }
+
+const deleteuserById = async (req, res) => {
+  try {
+    const userId = req.params.id
+    const result = await User.deleteOne({ _id: userId })
+    if (result.deletedCount === 0) {
+      res.status(404).json({ status: false, message: 'User not found' })
+    }
+    res.status(200)
+  } catch (error) {
+    next(error)
+  }
+}
+module.exports = {
+  createUser,
+  getUserById,
+  getAllUsers,
+  updateUserById,
+  deleteuserById,
+}

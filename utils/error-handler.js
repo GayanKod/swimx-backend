@@ -12,7 +12,9 @@ function errorHandler(err, req, res, next) {
   }
 
   // Set status code and send error response
-  res.status(statusCode).json({ status: false, error: message?.errors })
+  res
+    .status(statusCode)
+    .json({ status: false, error: message?.errors || message })
 }
 
 module.exports = errorHandler
