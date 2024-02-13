@@ -26,5 +26,4 @@ const createUser = async (req, res, next) => {
     next(error)
   }
 }
-
-module.exports = { createUser }
+const getAllUsers = async (req, res, next) => (module.exports = { createUser })
