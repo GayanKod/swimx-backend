@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 const UserRoute = require('./routes/UserRoute')
 
 app.use('/user', UserRoute)
-re
+
 app.use(errorHandler)
 
 app.listen(PORT, () => console.log(`Running on port ${PORT}`))

@@ -9,21 +9,66 @@ const createUser = async (req, res, next) => {
         .status(400)
         .json({ status: false, message: 'Missing required fields' })
     }
-    const allCoupons = await User.find({})
+    const allUsers = await User.find({})
     const user = new User({
       firstName,
       lastName,
       email,
       role,
-      id: 3000 + allCoupons.length,
+      id: 3000 + allUsers.length,
     })
 
     const savedUser = await user.save()
 
     res.status(201).json(savedUser)
   } catch (error) {
-    // Pass the error to the next middleware
     next(error)
   }
 }
-const getAllUsers = async (req, res, next) => (module.exports = { createUser })
+const getUserById = async (req, res, next) => {
+  try {
+    const userId = req.params.id
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ status: false, message: 'User not found' })
+    }
+
+    res.status(200).json(user)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const updateUserById = async (req, res, next) => {
+  try {
+    const { firstName, lastName, email } = req.body
+    const userId = req.params.id
+
+    User.findOne({ _id: userId }).catch(() => {
+      res.status(404).json({ status: false, message: 'User not found' })
+    })
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        firstName,
+        lastName,
+        email,
+      },
+      { new: true }
+    )
+    res.status(200).json(updatedUser)
+  } catch (error) {
+    next(error)
+  }
+}
+const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find({})
+    res.status(200).json(users)
+  } catch (error) {
+    next(error)
+  }
+}
+module.exports = { createUser, getUserById, getAllUsers, updateUserById }
