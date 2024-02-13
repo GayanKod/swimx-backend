@@ -19,8 +19,10 @@ app.get('/', (req, res) => {
 })
 
 const UserRoute = require('./routes/UserRoute')
+const CheckingRoute = require('./routes/CheckingRoute')
 
-app.use('/user', UserRoute)
+app.use('/api/user', UserRoute)
+app.use('/api/check', CheckingRoute)
 
 app.use(errorHandler)
 

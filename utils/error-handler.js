@@ -11,10 +11,9 @@ function errorHandler(err, req, res, next) {
     message = { errors }
   }
 
-  // Set status code and send error response
   res
     .status(statusCode)
-    .json({ status: false, error: message?.errors || message })
+    .json({ status: false, message: message?.errors || message })
 }
 
 module.exports = errorHandler

@@ -37,6 +37,13 @@ const userSchema = new mongoose.Schema(
       enum: ['USER', 'ADMIN'],
       default: 'USER',
     },
+    // Add reference to Checking model
+    checkings: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Checking',
+      },
+    ],
   },
   { timestamps: true }
 )

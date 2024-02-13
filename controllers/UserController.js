@@ -84,6 +84,7 @@ const deleteuserById = async (req, res) => {
     next(error)
   }
 }
+
 module.exports = {
   createUser,
   getUserById,
