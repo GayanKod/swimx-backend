@@ -6,7 +6,7 @@ const checking = async (req, res, next) => {
     const user = req.params.id
     const scannedTime = new Date()
 
-    User.findOne({ _id: userId }).catch(() => {
+    User.findOne({ _id: user }).catch(() => {
       res.status(404).json({ status: false, message: 'User not found' })
     })
 
@@ -58,11 +58,12 @@ const checking = async (req, res, next) => {
 const getCheckingById = async (req, res, next) => {
   try {
     const userId = req.params.id
-    const user = await Checking.findById(userId)
 
     User.findOne({ _id: userId }).catch(() => {
       res.status(404).json({ status: false, message: 'User not found' })
     })
+
+    const user = await Checking.findById(userId)
 
     if (!user) {
       return res
