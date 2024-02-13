@@ -99,8 +99,18 @@ const updateCheckinById = async (req, res, next) => {
     next(error)
   }
 }
+
+const getAllCheckings = async (req, res, next) => {
+  try {
+    const checkings = await Checking.find().sort({ createdAt: -1 })
+    res.status(200).json(checkings)
+  } catch (error) {
+    next(error)
+  }
+}
 module.exports = {
   checking,
   getCheckingById,
   updateCheckinById,
+  getAllCheckings,
 }
