@@ -1,4 +1,5 @@
 const Checking = require('../models/Checking')
+const User = require('../models/User')
 
 const checking = async (req, res, next) => {
   try {
@@ -9,7 +10,7 @@ const checking = async (req, res, next) => {
     const lastRecord = await Checking.findOne({ user: user })
       .sort({ createdAt: -1 })
       .exec()
-    console.log(lastRecord)
+
     //if not null     // check whther the date is same
     if (lastRecord && !lastRecord.checkoutTime) {
       const lastRecordDate = new Date(lastRecord.checkingTime)
@@ -20,20 +21,20 @@ const checking = async (req, res, next) => {
         lastRecordDate.getFullYear() === scannedTime.getFullYear()
       ) {
         console.log('The last record belongs to today.')
-        await Checking.findByIdAndUpdate(
+        const checkedOut = await Checking.findByIdAndUpdate(
           lastRecord._id,
           {
             checkoutTime: scannedTime,
           },
           { new: true }
         )
-        res.status(200).json('checked out')
+        res.status(200).json(checkedOut)
       } else {
         console.log('The last record does not belong to today.')
-        // send a suggetion
-        res
-          .status(200)
-          .json('Please checkout the last checking ' + lastRecord._id)
+        res.status(200).json({
+          status: true,
+          message: `Problem with ${lastRecord._id} checking.`,
+        })
       }
     } else {
       const checking = new Checking({
@@ -41,8 +42,9 @@ const checking = async (req, res, next) => {
         user,
       })
 
-      const savedRecord = await checking.save()
-      res.status(201).json('Checked in')
+      const checkedIn = await checking.save()
+
+      res.status(200).json(checkedIn)
     }
   } catch (error) {
     next(error)
@@ -65,7 +67,31 @@ const getCheckingById = async (req, res, next) => {
     next(error)
   }
 }
+
+const updateCheckinById = async (req, res, next) => {
+  try {
+    const { checkingTime, checkoutTime } = req.body
+    const userId = req.params.id
+
+    User.findOne({ _id: userId }).catch(() => {
+      res.status(404).json({ status: false, message: 'User not found' })
+    })
+
+    const updatedChecking = await Checking.findByIdAndUpdate(
+      userId,
+      {
+        checkingTime,
+        checkoutTime,
+      },
+      { new: true }
+    )
+    res.status(200).json(updatedChecking)
+  } catch (error) {
+    next(error)
+  }
+}
 module.exports = {
   checking,
   getCheckingById,
+  updateCheckinById,
 }
