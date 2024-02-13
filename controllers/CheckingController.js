@@ -6,6 +6,10 @@ const checking = async (req, res, next) => {
     const user = req.params.id
     const scannedTime = new Date()
 
+    User.findOne({ _id: userId }).catch(() => {
+      res.status(404).json({ status: false, message: 'User not found' })
+    })
+
     // check last record is null or not
     const lastRecord = await Checking.findOne({ user: user })
       .sort({ createdAt: -1 })
@@ -55,6 +59,10 @@ const getCheckingById = async (req, res, next) => {
   try {
     const userId = req.params.id
     const user = await Checking.findById(userId)
+
+    User.findOne({ _id: userId }).catch(() => {
+      res.status(404).json({ status: false, message: 'User not found' })
+    })
 
     if (!user) {
       return res
