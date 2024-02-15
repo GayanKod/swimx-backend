@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
   const formattedDate = currentDate.toLocaleString() // Format date and time as string
 
   // Send response with date, time, and message
-  res.send(`${formattedDate}`)
+  res.send(`Server reponse at ${formattedDate}`)
 })
 const AuthRoute = require('./routes/AuthRoute')
 const UserRoute = require('./routes/UserRoute')
