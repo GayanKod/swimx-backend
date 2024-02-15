@@ -40,7 +40,9 @@ const refreshToken = async (req, res, next) => {
     return res.status(403).json({ status: false, message: 'Invalid token.' })
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
     if (err)
-      return res.status(403).json({ status: false, message: 'Invalid token.' })
+      return res
+        .status(403)
+        .json({ status: false, message: 'Refresh token exprired' })
     const accessToken = generateAccessToken({ name: user.name })
     res.json({ accessToken: accessToken })
   })
