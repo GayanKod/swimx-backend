@@ -21,9 +21,9 @@ const AuthRoute = require('./routes/AuthRoute')
 const UserRoute = require('./routes/UserRoute')
 const CheckingRoute = require('./routes/CheckingRoute')
 
-app.use('/auth', AuthRoute)
-app.use('/api/user', authenticateToken, UserRoute)
-app.use('/api/check', authenticateToken, CheckingRoute)
+app.use('/auth/v1', AuthRoute)
+app.use('/api/v1/user', authenticateToken, UserRoute)
+app.use('/api/v1/check', authenticateToken, CheckingRoute)
 
 app.use(errorHandler)
 
