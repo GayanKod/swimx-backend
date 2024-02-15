@@ -8,7 +8,7 @@ function authenticateToken(req, res, next) {
   if (token == null)
     return res.status(403).send({
       status: false,
-      message: 'Unauthorized',
+      message: 'Missing token.',
     })
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
@@ -30,12 +30,13 @@ async function isAdmin(req, res, next) {
   const existingUser = await User.findOne({ id: decoded.id })
 
   if (!existingUser) {
-    return res
-      .status(401)
-      .json({ status: false, message: 'Invalid username or passoword.' })
+    return res.status(401).send({
+      status: false,
+      message: 'Access Denied',
+    })
   }
   if (existingUser.role !== 'ADMIN')
-    return res.status(403).send({
+    return res.status(401).send({
       status: false,
       message: 'Access Denied',
     })

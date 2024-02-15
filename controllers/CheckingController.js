@@ -108,9 +108,39 @@ const getAllCheckings = async (req, res, next) => {
     next(error)
   }
 }
+
+const deleteCheckingById = async (req, res) => {
+  try {
+    const checkingId = req.params.id
+    const result = await Checking.deleteOne({ _id: checkingId })
+    if (result.deletedCount === 0) {
+      res.status(404).json({ status: false, message: 'Checking not found' })
+    }
+    res.status(200)
+  } catch (error) {
+    next(error)
+  }
+}
+const getCheckingsByUserId = async (req, res, next) => {
+  try {
+    const userId = req.params.id
+
+    User.findOne({ _id: userId }).catch(() => {
+      res.status(404).json({ status: false, message: 'User not found' })
+    })
+
+    const checkings = await Checking.find({ user: userId })
+
+    res.status(200).json(checkings)
+  } catch (error) {
+    next(error)
+  }
+}
 module.exports = {
   checking,
   getCheckingById,
   updateCheckinById,
   getAllCheckings,
+  deleteCheckingById,
+  getCheckingsByUserId,
 }

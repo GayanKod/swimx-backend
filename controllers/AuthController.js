@@ -1,7 +1,11 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const { generateAccessToken } = require('../utils/AuthUtils')
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require('../utils/AuthUtils')
 const User = require('../models/User')
+
 let refreshTokens = []
 
 const login = async (req, res, next) => {
@@ -23,7 +27,7 @@ const login = async (req, res, next) => {
 
   const user = { id: existingUser.id }
   const accessToken = generateAccessToken(user)
-  const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET)
+  const refreshToken = generateRefreshToken(user)
   refreshTokens.push(refreshToken)
   res.json({ accessToken: accessToken, refreshToken: refreshToken })
 }
@@ -31,7 +35,7 @@ const login = async (req, res, next) => {
 const refreshToken = async (req, res, next) => {
   const refreshToken = req.body.token
   if (refreshToken == null)
-    return res.status(401).json({ status: false, message: 'Invalid token.' })
+    return res.status(403).json({ status: false, message: 'Invalid token.' })
   if (!refreshTokens.includes(refreshToken))
     return res.status(403).json({ status: false, message: 'Invalid token.' })
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {

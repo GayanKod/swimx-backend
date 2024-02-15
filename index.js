@@ -1,7 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const errorHandler = require('./utils/error-handler')
+const errorHandler = require('./utils/ErrorHandler')
 const { authenticateToken } = require('./middlewares/AuthMiddleware')
 const PORT = process.env.PORT || 5001
 
