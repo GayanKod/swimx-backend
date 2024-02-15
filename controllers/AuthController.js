@@ -1,11 +1,27 @@
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 const { generateAccessToken } = require('../utils/AuthUtils')
+const User = require('../models/User')
 let refreshTokens = []
 
 const login = async (req, res, next) => {
-  const username = req.body.username
-  const user = { name: username }
+  const { email, password } = req.body
+  const existingUser = await User.findOne({ email: email })
 
+  if (!existingUser) {
+    return res
+      .status(401)
+      .json({ status: false, message: 'Invalid username or passoword.' })
+  }
+  const passwordMatch = await bcrypt.compare(password, existingUser.password)
+
+  if (!passwordMatch) {
+    return res
+      .status(401)
+      .json({ status: false, message: 'Invalid username or passoword.' })
+  }
+
+  const user = { id: existingUser.id }
   const accessToken = generateAccessToken(user)
   const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET)
   refreshTokens.push(refreshToken)
@@ -14,10 +30,13 @@ const login = async (req, res, next) => {
 
 const refreshToken = async (req, res, next) => {
   const refreshToken = req.body.token
-  if (refreshToken == null) return res.sendStatus(401)
-  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403)
+  if (refreshToken == null)
+    return res.status(401).json({ status: false, message: 'Invalid token.' })
+  if (!refreshTokens.includes(refreshToken))
+    return res.status(403).json({ status: false, message: 'Invalid token.' })
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403)
+    if (err)
+      return res.status(403).json({ status: false, message: 'Invalid token.' })
     const accessToken = generateAccessToken({ name: user.name })
     res.json({ accessToken: accessToken })
   })

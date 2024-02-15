@@ -1,14 +1,16 @@
 const User = require('../models/User')
-
+const bcrypt = require('bcrypt')
 const createUser = async (req, res, next) => {
   try {
-    const { firstName, lastName, email, role } = req.body
+    const { firstName, lastName, email, role, password, phoneNumber } = req.body
 
-    if (!firstName || !lastName || !email) {
+    if (!firstName || !lastName || !email || !password) {
       return res
         .status(400)
         .json({ status: false, message: 'Missing required fields' })
     }
+    const hashedPassword = await bcrypt.hash(password, 10)
+
     const allUsers = await User.find({})
     const user = new User({
       firstName,
@@ -16,6 +18,8 @@ const createUser = async (req, res, next) => {
       email,
       role,
       id: 3000 + allUsers.length,
+      password: hashedPassword,
+      phoneNumber,
     })
 
     const savedUser = await user.save()

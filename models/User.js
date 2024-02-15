@@ -32,6 +32,13 @@ const userSchema = new mongoose.Schema(
     qr: {
       type: String,
     },
+    password: {
+      type: String,
+      required: [true, 'Password is required.'],
+    },
+    phoneNumber: {
+      type: String,
+    },
     role: {
       type: String,
       enum: ['USER', 'ADMIN'],
