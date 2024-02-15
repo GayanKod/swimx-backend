@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const errorHandler = require('./utils/error-handler')
-
+const authenticateToken = require('./middlewares/AuthMiddleware')
 const PORT = process.env.PORT || 5001
 
 const connectDB = require('./config/db')
@@ -17,12 +17,13 @@ connectDB()
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
-
+const AuthRoute = require('./routes/AuthRoute')
 const UserRoute = require('./routes/UserRoute')
 const CheckingRoute = require('./routes/CheckingRoute')
 
-app.use('/api/user', UserRoute)
-app.use('/api/check', CheckingRoute)
+app.use('/auth', AuthRoute)
+app.use('/api/user', authenticateToken, UserRoute)
+app.use('/api/check', authenticateToken, CheckingRoute)
 
 app.use(errorHandler)
 
