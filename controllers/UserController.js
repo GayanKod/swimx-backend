@@ -10,7 +10,12 @@ const createUser = async (req, res, next) => {
         .json({ status: false, message: 'Missing required fields' })
     }
     const hashedPassword = await bcrypt.hash(password, 10)
-
+    const existUser = await User.findOne({ email: email })
+    if (existUser) {
+      return res
+        .status(400)
+        .json({ status: false, message: 'Email is already exists.' })
+    }
     const allUsers = await User.find({})
     const user = new User({
       firstName,
@@ -51,7 +56,12 @@ const updateUserById = async (req, res, next) => {
     User.findOne({ _id: userId }).catch(() => {
       res.status(404).json({ status: false, message: 'User not found' })
     })
-
+    const existUser = await User.findOne({ email: email })
+    if (existUser) {
+      return res
+        .status(400)
+        .json({ status: false, message: 'Email is already exists.' })
+    }
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
