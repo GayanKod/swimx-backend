@@ -16,7 +16,7 @@ connectDB()
 // test api
 app.get('/', (req, res) => {
   const currentDate = new Date()
-  const formattedDate = currentDate.toLocaleString() // Format date and time as string
+  const formattedDate = currentDate.toLocaleString()
 
   // Send response with date, time, and message
   res.send(`Server reponse at ${formattedDate}`)
