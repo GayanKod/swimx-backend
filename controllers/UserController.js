@@ -46,9 +46,8 @@ const getUserById = async (req, res, next) => {
 
 const updateUserById = async (req, res, next) => {
   try {
-    const { firstName, lastName, email } = req.body
+    const { firstName, lastName, email, phoneNumber } = req.body
     const userId = req.params.id
-
     User.findOne({ _id: userId }).catch(() => {
       res.status(404).json({ status: false, message: 'User not found' })
     })
@@ -59,6 +58,7 @@ const updateUserById = async (req, res, next) => {
         firstName,
         lastName,
         email,
+        phoneNumber,
       },
       { new: true }
     )
@@ -71,6 +71,39 @@ const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({})
     res.status(200).json(users)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const updatePasswordById = async (req, res, next) => {
+  try {
+    const { currentPassword, NewPassword } = req.body
+    const userId = req.params.id
+    User.findOne({ _id: userId })
+      .then(async (existingUser) => {
+        const passwordMatch = await bcrypt.compare(
+          currentPassword,
+          existingUser.password
+        )
+        if (!passwordMatch) {
+          return res
+            .status(200)
+            .json({ status: false, message: 'Missmatch current password' })
+        }
+        const hashedNewPassword = await bcrypt.hash(NewPassword, 10)
+        const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          {
+            password: hashedNewPassword,
+          },
+          { new: true }
+        )
+        res.status(200).json(updatedUser)
+      })
+      .catch(() => {
+        res.status(404).json({ status: false, message: 'User not found' })
+      })
   } catch (error) {
     next(error)
   }
@@ -97,4 +130,5 @@ module.exports = {
   getAllUsers,
   updateUserById,
   deleteuserById,
+  updatePasswordById,
 }
