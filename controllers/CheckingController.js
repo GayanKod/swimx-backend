@@ -25,10 +25,15 @@ const checking = async (req, res, next) => {
         lastRecordDate.getFullYear() === scannedTime.getFullYear()
       ) {
         console.log('The last record belongs to today.')
+        const differenceInMilliseconds = lastRecordDate - scannedTime
+        const differenceInHours = Math.abs(
+          differenceInMilliseconds / (1000 * 60 * 60)
+        )
         const checkedOut = await Checking.findByIdAndUpdate(
           lastRecord._id,
           {
             checkoutTime: scannedTime,
+            hours: differenceInHours.toFixed(2),
           },
           { new: true }
         )
@@ -63,7 +68,10 @@ const getCheckingById = async (req, res, next) => {
       res.status(404).json({ status: false, message: 'User not found' })
     })
 
-    const user = await Checking.findById(userId).populate('user')
+    const user = await Checking.findById(userId).populate({
+      path: 'user',
+      select: '-password -role',
+    })
 
     if (!user) {
       return res
@@ -79,7 +87,7 @@ const getCheckingById = async (req, res, next) => {
 
 const updateCheckinById = async (req, res, next) => {
   try {
-    const { checkingTime, checkoutTime } = req.body
+    const { checkingTime, checkoutTime, paid, hours } = req.body
     const userId = req.params.id
 
     User.findOne({ _id: userId }).catch(() => {
@@ -91,6 +99,8 @@ const updateCheckinById = async (req, res, next) => {
       {
         checkingTime,
         checkoutTime,
+        paid,
+        hours,
       },
       { new: true }
     )
@@ -102,9 +112,10 @@ const updateCheckinById = async (req, res, next) => {
 
 const getAllCheckings = async (req, res, next) => {
   try {
-    const checkings = await Checking.find()
-      .sort({ createdAt: -1 })
-      .populate('user')
+    const checkings = await Checking.find().sort({ createdAt: -1 }).populate({
+      path: 'user',
+      select: '-password -role',
+    })
     res.status(200).json(checkings)
   } catch (error) {
     next(error)
@@ -131,7 +142,10 @@ const getCheckingsByUserId = async (req, res, next) => {
       res.status(404).json({ status: false, message: 'User not found' })
     })
 
-    const checkings = await Checking.find({ user: userId }).populate('user')
+    const checkings = await Checking.find({ user: userId }).populate({
+      path: 'user',
+      select: '-password -role',
+    })
 
     res.status(200).json(checkings)
   } catch (error) {

@@ -14,6 +14,15 @@ const checkingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+    hours: {
+      type: Number,
+      default: 0,
+    },
+    paid: {
+      type: String,
+      enum: ['PAID', 'PENDING'],
+      default: 'PENDING',
+    },
   },
   { timestamps: true }
 )
