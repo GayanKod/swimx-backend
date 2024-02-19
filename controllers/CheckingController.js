@@ -63,7 +63,7 @@ const getCheckingById = async (req, res, next) => {
       res.status(404).json({ status: false, message: 'User not found' })
     })
 
-    const user = await Checking.findById(userId)
+    const user = await Checking.findById(userId).populate('user')
 
     if (!user) {
       return res
@@ -102,7 +102,9 @@ const updateCheckinById = async (req, res, next) => {
 
 const getAllCheckings = async (req, res, next) => {
   try {
-    const checkings = await Checking.find().sort({ createdAt: -1 })
+    const checkings = await Checking.find()
+      .sort({ createdAt: -1 })
+      .populate('user')
     res.status(200).json(checkings)
   } catch (error) {
     next(error)
@@ -129,7 +131,7 @@ const getCheckingsByUserId = async (req, res, next) => {
       res.status(404).json({ status: false, message: 'User not found' })
     })
 
-    const checkings = await Checking.find({ user: userId })
+    const checkings = await Checking.find({ user: userId }).populate('user')
 
     res.status(200).json(checkings)
   } catch (error) {
